@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marvel MCU – Alle Filme</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red:    #E4151B;
+    --gold:   #C9932A;
+    --bg:     #0D0D0D;
+    --panel:  #141414;
+    --card:   #1A1A1A;
+    --border: #2A2A2A;
+    --text:   #E8E8E8;
+    --muted:  #666;
+    --done:   #2A2A2A;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--panel);
+    border-bottom: 2px solid var(--red);
+    padding: 36px 24px 28px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(38px, 8vw, 64px);
+    letter-spacing: 6px;
+    color: var(--red);
+    line-height: 1;
+  }
+
+  .logo span { color: var(--text); }
+
+  .subtitle {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* PROGRESS */
+  .progress-wrap {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .progress-track {
+    width: min(340px, 80vw);
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--red), var(--gold));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .progress-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--gold);
+    min-width: 60px;
+  }
+
+  /* PHASE SECTIONS */
+  main { padding: 32px 16px 60px; max-width: 720px; margin: 0 auto; }
+
+  .phase {
+    margin-bottom: 40px;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .phase-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .phase-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--text);
+  }
+
+  .phase-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* FILM CARDS */
+  .film-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .film-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .film-card:hover { border-color: #444; }
+
+  .film-card.done {
+    background: var(--done);
+    border-color: var(--border);
+    opacity: 0.55;
+  }
+
+  .film-card.done .film-title { text-decoration: line-through; color: var(--muted); }
+
+  /* NUMBER */
+  .film-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--muted);
+    min-width: 28px;
+    text-align: right;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .film-card.done .film-num { color: #3A3A3A; }
+
+  /* CHECKBOX */
+  .checkbox {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .film-card.done .checkbox {
+    background: var(--red);
+    border-color: var(--red);
+  }
+
+  .checkmark {
+    opacity: 0;
+    transition: opacity 0.2s;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .film-card.done .checkmark { opacity: 1; }
+
+  /* TEXT */
+  .film-info { flex: 1; min-width: 0; }
+
+  .film-title {
+    font-weight: 500;
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.3;
+    transition: color 0.2s;
+  }
+
+  .film-year {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: 1px;
+  }
+
+  /* RESET */
+  .reset-wrap {
+    text-align: center;
+    margin-top: 16px;
+  }
+
+  .reset-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .reset-btn:hover { border-color: var(--red); color: var(--red); }
+
+  /* CONFETTI overlay */
+  #congrats {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 32px;
+  }
+
+  #congrats.show { display: flex; }
+
+  #congrats h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 8vw, 60px);
+    color: var(--red);
+    letter-spacing: 4px;
+    margin-bottom: 12px;
+  }
+
+  #congrats p { color: var(--muted); font-size: 14px; letter-spacing: 1px; margin-bottom: 28px; }
+
+  #congrats button {
+    background: var(--red);
+    border: none;
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 3px;
+    padding: 12px 32px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">MARVEL<span> MCU</span></div>
+  <div class="subtitle">Alle Kinofilme in Reihenfolge</div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 / 37</div>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<div class="reset-wrap">
+  <button class="reset-btn" onclick="resetAll()">Alles zurücksetzen</button>
+</div>
+
+<div id="congrats">
+  <h2>Avengers Assembled!</h2>
+  <p>Du hast alle 37 MCU-Filme geschaut. Legendär.</p>
+  <button onclick="document.getElementById('congrats').classList.remove('show')">Schließen</button>
+</div>
+
+<script>
+const phases = [
+  {
+    label: "Phase 1",
+    name: "Die Infinity-Saga · Anfang",
+    films: [
+      { title: "Iron Man", year: 2008 },
+      { title: "Der unglaubliche Hulk", year: 2008 },
+      { title: "Iron Man 2", year: 2010 },
+      { title: "Thor", year: 2011 },
+      { title: "Captain America: The First Avenger", year: 2011 },
+      { title: "Marvel's The Avengers", year: 2012 },
+    ]
+  },
+  {
+    label: "Phase 2",
+    name: "Die Infinity-Saga · Aufbau",
+    films: [
+      { title: "Iron Man 3", year: 2013 },
+      { title: "Thor: The Dark Kingdom", year: 2013 },
+      { title: "The Return of the First Avenger", year: 2014 },
+      { title: "Guardians of the Galaxy", year: 2014 },
+      { title: "Avengers: Age of Ultron", year: 2015 },
+      { title: "Ant-Man", year: 2015 },
+    ]
+  },
+  {
+    label: "Phase 3",
+    name: "Die Infinity-Saga · Finale",
+    films: [
+      { title: "The First Avenger: Civil War", year: 2016 },
+      { title: "Doctor Strange", year: 2016 },
+      { title: "Guardians of the Galaxy Vol. 2", year: 2017 },
+      { title: "Spider-Man: Homecoming", year: 2017 },
+      { title: "Thor: Tag der Entscheidung", year: 2017 },
+      { title: "Black Panther", year: 2018 },
+      { title: "Avengers: Infinity War", year: 2018 },
+      { title: "Ant-Man and the Wasp", year: 2018 },
+      { title: "Captain Marvel", year: 2019 },
+      { title: "Avengers: Endgame", year: 2019 },
+      { title: "Spider-Man: Far from Home", year: 2019 },
+    ]
+  },
+  {
+    label: "Phase 4",
+    name: "Die Multiverse-Saga · Beginn",
+    films: [
+      { title: "Black Widow", year: 2021 },
+      { title: "Shang-Chi and the Legend of the Ten Rings", year: 2021 },
+      { title: "Eternals", year: 2021 },
+      { title: "Spider-Man: No Way Home", year: 2021 },
+      { title: "Doctor Strange in the Multiverse of Madness", year: 2022 },
+      { title: "Thor: Love and Thunder", year: 2022 },
+      { title: "Black Panther: Wakanda Forever", year: 2022 },
+    ]
+  },
+  {
+    label: "Phase 5",
+    name: "Die Multiverse-Saga · Eskalation",
+    films: [
+      { title: "Ant-Man and the Wasp: Quantumania", year: 2023 },
+      { title: "Guardians of the Galaxy Vol. 3", year: 2023 },
+      { title: "The Marvels", year: 2023 },
+      { title: "Deadpool & Wolverine", year: 2024 },
+      { title: "Captain America: Brave New World", year: 2025 },
+      { title: "Thunderbolts*", year: 2025 },
+    ]
+  },
+  {
+    label: "Phase 6",
+    name: "Die Multiverse-Saga · Finale",
+    films: [
+      { title: "The Fantastic Four: First Steps", year: 2025 },
+      { title: "Spider-Man: Brand New Day", year: 2026 },
+      { title: "Avengers: Doomsday", year: 2026 },
+      { title: "Avengers: Secret Wars", year: 2027 },
+    ]
+  }
+];
+
+const TOTAL = phases.reduce((s, p) => s + p.films.length, 0);
+let checked = JSON.parse(localStorage.getItem('mcu_checked') || '{}');
+
+function save() { localStorage.setItem('mcu_checked', JSON.stringify(checked)); }
+
+function updateProgress() {
+  const done = Object.values(checked).filter(Boolean).length;
+  const pct = (done / TOTAL * 100).toFixed(1);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `${done} / ${TOTAL}`;
+  if (done === TOTAL) {
+    setTimeout(() => document.getElementById('congrats').classList.add('show'), 400);
+  }
+}
+
+function toggle(id, card) {
+  checked[id] = !checked[id];
+  card.classList.toggle('done', checked[id]);
+  save();
+  updateProgress();
+}
+
+function resetAll() {
+  if (!confirm('Wirklich alles zurücksetzen?')) return;
+  checked = {};
+  save();
+  document.querySelectorAll('.film-card').forEach(c => c.classList.remove('done'));
+  updateProgress();
+}
+
+function render() {
+  const main = document.getElementById('main');
+  let globalIdx = 0;
+
+  phases.forEach(phase => {
+    const section = document.createElement('section');
+    section.className = 'phase';
+
+    section.innerHTML = `
+      <div class="phase-header">
+        <div class="phase-label">${phase.label}</div>
+        <div class="phase-title">${phase.name}</div>
+        <div class="phase-line"></div>
+      </div>
+      <div class="film-list" id="list-${phase.label}"></div>
+    `;
+
+    const list = section.querySelector('.film-list');
+
+    phase.films.forEach(film => {
+      globalIdx++;
+      const id = `film-${globalIdx}`;
+      const card = document.createElement('div');
+      card.className = 'film-card' + (checked[id] ? ' done' : '');
+      card.innerHTML = `
+        <div class="film-num">${globalIdx}</div>
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="film-info">
+          <div class="film-title">${film.title}</div>
+          <div class="film-year">${film.year}</div>
+        </div>
+      `;
+      card.addEventListener('click', () => toggle(id, card));
+      list.appendChild(card);
+    });
+
+    main.appendChild(section);
+  });
+
+  updateProgress();
+}
+
+render();
+</script>
+</body>
+</html>
